@@ -1,6 +1,8 @@
 import fnmatch
+import datetime
 from typing import Optional
 
+import parse
 from bs4 import BeautifulSoup
 
 from .models import TwitterProfile
@@ -21,11 +23,15 @@ class NitterParser:
         profile_id = self._get_profile_id()
         username = self._get_profile_username()
         fullname = self._get_profile_fullname()
+        biography = self._get_profile_biography()
+        joined_datetime = self._get_profile_join_datetime()
 
         return TwitterProfile(
             id=profile_id,  # noqa
             username=username,
             fullname=fullname,
+            biography=biography,
+            joined_datetime=joined_datetime,
         )
 
     def _is_profile_notfound(self) -> bool:
@@ -58,3 +64,14 @@ class NitterParser:
 
     def _get_profile_fullname(self) -> str:
         return self.soup.find("a", class_="profile-card-fullname").text
+
+    def _get_profile_biography(self) -> str:
+        return self.soup.find("div", class_="profile-bio").text
+
+    def _get_profile_join_datetime(self) -> datetime.datetime:
+        value = self.soup.find("div", class_="profile-joindate").find("span").get("title")
+
+        # Example: '8:50 PM - 21 Mar 2006'
+        datetime_format = "%I:%M %p - %d %b %Y"
+
+        return datetime.datetime.strptime(value, datetime_format).replace(tzinfo=datetime.timezone.utc)
