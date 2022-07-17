@@ -25,6 +25,7 @@ class NitterParser:
         fullname = self._get_profile_fullname()
         biography = self._get_profile_biography()
         joined_datetime = self._get_profile_join_datetime()
+        stats = self._get_profile_stats()
 
         return TwitterProfile(
             id=profile_id,  # noqa
@@ -32,6 +33,7 @@ class NitterParser:
             fullname=fullname,
             biography=biography,
             joined_datetime=joined_datetime,
+            stats=stats,
         )
 
     def _is_profile_notfound(self) -> bool:
@@ -75,3 +77,17 @@ class NitterParser:
         datetime_format = "%I:%M %p - %d %b %Y"
 
         return datetime.datetime.strptime(value, datetime_format).replace(tzinfo=datetime.timezone.utc)
+
+    def _get_profile_stats(self) -> TwitterProfile.Stats:
+        ul = self.soup.find("ul", class_="profile-statlist")
+        posts = ul.find("li", class_="posts").text
+        following = ul.find("li", class_="following").text
+        followers = ul.find("li", class_="followers").text
+        likes = ul.find("li", class_="likes").text
+
+        return TwitterProfile.Stats(
+            tweets=posts,  # noqa
+            following=following,  # noqa
+            followers=followers,  # noqa
+            likes=likes,  # noqa
+        )
