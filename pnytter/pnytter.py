@@ -3,6 +3,7 @@ from typing import List, Collection, Optional
 
 import pydantic
 import requests
+from urljoin import url_path_join
 
 from .nitter_parser import NitterParser
 from .models.profiles import TwitterProfile
@@ -39,7 +40,7 @@ class Pnytter(pydantic.BaseModel):
         """Perform an HTTP request to Nitter, for the given endpoint.
         This method chooses a random Nitter instance to use for the request."""
         nitter_instance = self._get_random_nitter_instance()
-        url = f"{nitter_instance}/{endpoint}"  # TODO safe urljoin
+        url = url_path_join(nitter_instance, endpoint)
         return self._raw_request(
             method=method,
             url=url,
