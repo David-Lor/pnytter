@@ -1,5 +1,5 @@
 import random
-from typing import List, Optional
+from typing import List, Collection, Optional
 
 import pydantic
 import requests
@@ -23,7 +23,7 @@ class Pnytter(pydantic.BaseModel):
         """Retrieve a random Nitter instance URL from the 'nitter_instances' list."""
         return random.choice(self.nitter_instances)
 
-    def _raw_request(self, method: str, url: str) -> str:
+    def _raw_request(self, method: str, url: str, ignore_statuscodes: Collection[int]) -> str:
         """Method for performing an HTTP request, and returning the response body as string.
         This method can be overriden by the code that uses Pnytter, if required."""
         r = requests.request(
@@ -31,10 +31,11 @@ class Pnytter(pydantic.BaseModel):
             url=url,
             timeout=self.request_timeout,
         )
-        r.raise_for_status()
+        if r.status_code not in ignore_statuscodes:
+            r.raise_for_status()
         return r.text
 
-    def _request_nitter(self, endpoint: str, method: str = "GET") -> str:
+    def _request_nitter(self, endpoint: str, method: str = "GET", ignore_statuscodes: Optional[Collection[int]] = None) -> str:
         """Perform an HTTP request to Nitter, for the given endpoint.
         This method chooses a random Nitter instance to use for the request."""
         nitter_instance = self._get_random_nitter_instance()
@@ -42,11 +43,13 @@ class Pnytter(pydantic.BaseModel):
         return self._raw_request(
             method=method,
             url=url,
+            ignore_statuscodes=ignore_statuscodes or (),
         )
 
     def find_user(self, username: str) -> Optional[TwitterProfile]:
         html = self._request_nitter(
-            endpoint=username
+            endpoint=username,
+            ignore_statuscodes=[404],
         )
         parser = NitterParser(html)
         return parser.get_profile()
