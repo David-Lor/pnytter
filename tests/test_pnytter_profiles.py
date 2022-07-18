@@ -2,9 +2,10 @@ import uuid
 
 import pytest
 
-from pnytter import TwitterProfile
+from pnytter import TwitterProfile, TwitterURL
 
 
+# noinspection PyTypeChecker
 @pytest.mark.parametrize("username, expected_result", [
     pytest.param(
         "jack",
@@ -20,6 +21,16 @@ from pnytter import TwitterProfile
                 following=4500,
                 followers=6419000,
                 likes=35000,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=TwitterURL(
+                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1115644092329758721%2FAFjOr-K8.jpg",
+                    twitter_url="https://pbs.twimg.com/profile_images/1115644092329758721/AFjOr-K8.jpg",
+                ),
+                banner=TwitterURL(
+                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F12%2F1584998840%2F1500x500",
+                    twitter_url="https://pbs.twimg.com/profile_banners/12/1584998840/1500x500",
+                ),
             ),
         ),
         id="@jack",
@@ -38,6 +49,16 @@ from pnytter import TwitterProfile
                 following=110,
                 followers=101465000,
                 likes=13500,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=TwitterURL(
+                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1529956155937759233%2FNyn1HZWF.jpg",
+                    twitter_url="https://pbs.twimg.com/profile_images/1529956155937759233/Nyn1HZWF.jpg",
+                ),
+                banner=TwitterURL(
+                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F44196397%2F1576183471%2F1500x500",
+                    twitter_url="https://pbs.twimg.com/profile_banners/44196397/1576183471/1500x500",
+                ),
             ),
         ),
         id="@elonmusk",

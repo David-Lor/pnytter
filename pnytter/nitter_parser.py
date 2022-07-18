@@ -2,10 +2,9 @@ import fnmatch
 import datetime
 from typing import Optional
 
-import parse
 from bs4 import BeautifulSoup
 
-from .models import TwitterProfile
+from .models import TwitterProfile, TwitterURL
 
 
 class NitterParser:
@@ -20,20 +19,23 @@ class NitterParser:
         if self._is_profile_notfound():
             return None
 
-        profile_id = self._get_profile_id()
         username = self._get_profile_username()
         fullname = self._get_profile_fullname()
         biography = self._get_profile_biography()
         joined_datetime = self._get_profile_join_datetime()
         stats = self._get_profile_stats()
+        pictures = self._get_profile_pictures()
+        profile_id = self._get_profile_id_from_profile_pictures(pictures)
 
+        # noinspection PyTypeChecker
         return TwitterProfile(
-            id=profile_id,  # noqa
+            id=profile_id,
             username=username,
             fullname=fullname,
             biography=biography,
             joined_datetime=joined_datetime,
             stats=stats,
+            pictures=pictures,
         )
 
     def _is_profile_notfound(self) -> bool:
@@ -41,24 +43,6 @@ class NitterParser:
         if not errorpanel:
             return False
         return fnmatch.fnmatch(errorpanel.text, """User "*" not found""")
-
-    def _get_profile_id(self) -> str:
-        profile_banner = self.soup.find("div", class_="profile-banner")
-        # Given:
-        # <div class="profile-banner"><a href="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F12%2F1584998840%2F1500x500" target="_blank"><img src="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F12%2F1584998840%2F1500x500" alt="" /></a></div>
-        # the userid is 12
-
-        profile_banner_href = profile_banner.find("a").get("href")
-        # Given:
-        # '/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F12%2F1584998840%2F1500x500'
-        # the userid is 12
-
-        profile_banner_href = profile_banner_href.replace("/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F", "")
-        # Given:
-        # '12%2F1584998840%2F1500x500'
-        # the userid is 12 (first characters before '%2F'...)
-
-        return profile_banner_href.split("%2F")[0]
 
     def _get_profile_username(self) -> str:
         # Remove the first character ("@") from the element
@@ -91,3 +75,23 @@ class NitterParser:
             followers=followers,  # noqa
             likes=likes,  # noqa
         )
+
+    def _get_profile_pictures(self) -> TwitterProfile.Pictures:
+        pic_profile_src = self.soup.find("a", class_="profile-card-avatar").get("href")
+
+        pic_banner_div = self.soup.find("div", class_="profile-banner")
+        pic_banner_src = pic_banner_div.find("a").get("href")
+
+        return TwitterProfile.Pictures(
+            profile=TwitterURL.from_nitter_path(pic_profile_src),
+            banner=TwitterURL.from_nitter_path(pic_banner_src),
+        )
+
+    @staticmethod
+    def _get_profile_id_from_profile_pictures(pictures: TwitterProfile.Pictures) -> str:
+        banner_path = pictures.banner.twitter_url.path
+        # if banner_path="/profile_banners/12/1584998840/1500x500"
+        # then profile_id="12"
+        banner_path_chunks = banner_path.split("/")
+        chunk_index = banner_path_chunks.index("profile_banners") + 1
+        return banner_path_chunks[chunk_index]
