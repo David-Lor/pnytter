@@ -30,6 +30,7 @@ class TwitterProfile(BasePnytterModel):
     username: str = NEString
     fullname: str
     biography: str
+    verified: bool = False
     joined_datetime: datetime.datetime
     stats: Stats
     pictures: Pictures

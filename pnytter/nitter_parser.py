@@ -22,6 +22,7 @@ class NitterParser:
         username = self._get_profile_username()
         fullname = self._get_profile_fullname()
         biography = self._get_profile_biography()
+        verified = self._get_profile_verified()
         joined_datetime = self._get_profile_join_datetime()
         stats = self._get_profile_stats()
         pictures = self._get_profile_pictures()
@@ -33,6 +34,7 @@ class NitterParser:
             username=username,
             fullname=fullname,
             biography=biography,
+            verified=verified,
             joined_datetime=joined_datetime,
             stats=stats,
             pictures=pictures,
@@ -53,6 +55,9 @@ class NitterParser:
 
     def _get_profile_biography(self) -> str:
         return self.soup.find("div", class_="profile-bio").text
+
+    def _get_profile_verified(self) -> bool:
+        return self.soup.find("span", class_="verified-icon") is not None
 
     def _get_profile_join_datetime(self) -> datetime.datetime:
         value = self.soup.find("div", class_="profile-joindate").find("span").get("title")

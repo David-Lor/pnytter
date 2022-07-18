@@ -14,7 +14,8 @@ from pnytter import TwitterProfile, TwitterURL
             username="jack",
             fullname="jack",
             biography="#bitcoin",
-            joined_datetime="2006-03-21T20:50:00Z",  # noqa
+            verified=True,
+            joined_datetime="2006-03-21T20:50:00Z",
             stats=TwitterProfile.Stats(
                 # at 2022-07-17, decreased
                 tweets=28000,
@@ -42,7 +43,8 @@ from pnytter import TwitterProfile, TwitterURL
             username="elonmusk",
             fullname="Elon Musk",
             biography="Mars & Cars, Chips & Dips",
-            joined_datetime="2009-06-02T20:12:00Z",  # noqa
+            verified=True,
+            joined_datetime="2009-06-02T20:12:00Z",
             stats=TwitterProfile.Stats(
                 # at 2022-07-17, decreased
                 tweets=18700,
@@ -62,6 +64,35 @@ from pnytter import TwitterProfile, TwitterURL
             ),
         ),
         id="@elonmusk",
+    ),
+    pytest.param(
+        "possumeveryhour",
+        TwitterProfile(
+            id=1022089486849765376,
+            username="PossumEveryHour",
+            fullname="Possum Every Hour",
+            biography="All images belong to their original owners. Failures may occassionally occur. For problems and new image submissions DM @ThunderySteak",
+            verified=False,
+            joined_datetime="2018-07-25T12:01:00Z",
+            stats=TwitterProfile.Stats(
+                # at 2022-07-18, decreased
+                tweets=34100,
+                following=1,
+                followers=571300,
+                likes=0,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=TwitterURL(
+                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1022090933343608833%2FxZvdXf7E.jpg",
+                    twitter_url="https://pbs.twimg.com/profile_images/1022090933343608833/xZvdXf7E.jpg",
+                ),
+                banner=TwitterURL(
+                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F1022089486849765376%2F1546021838%2F1500x500",
+                    twitter_url="https://pbs.twimg.com/profile_banners/1022089486849765376/1546021838/1500x500",
+                ),
+            ),
+        ),
+        id="@PossumEveryHour",
     ),
     pytest.param(
         str(uuid.uuid4()),
