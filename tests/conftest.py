@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import pydantic
 import pytest
@@ -7,7 +7,7 @@ from pnytter import Pnytter
 
 
 class PnytterTestsSettings(pydantic.BaseSettings):
-    nitter_instances: List[pydantic.AnyUrl]
+    nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl]
 
     class Config:
         env_prefix = "TEST_"

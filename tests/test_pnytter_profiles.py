@@ -20,7 +20,7 @@ from pnytter import TwitterProfile, TwitterURL
                 # at 2022-07-17, decreased
                 tweets=28000,
                 following=4500,
-                followers=6419000,
+                followers=6410000,
                 likes=35000,
             ),
             pictures=TwitterProfile.Pictures(

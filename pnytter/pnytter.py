@@ -1,5 +1,5 @@
 import random
-from typing import List, Collection, Optional
+from typing import List, Collection, Optional, Union
 
 import pydantic
 import requests
@@ -13,12 +13,18 @@ __all__ = ("Pnytter",)
 
 class Pnytter(pydantic.BaseModel):
 
-    nitter_instances: List[pydantic.AnyUrl] = pydantic.Field(..., min_items=1)
+    nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl] = pydantic.Field(..., min_items=1)
     """List of the Nitter instances to use. Each instance must be given as the base URL of the Nitter server.
     At least one instance is required."""
 
     request_timeout: float = pydantic.Field(default=10, ge=0)
     """Timeout in seconds for HTTP requests."""
+
+    @pydantic.validator("nitter_instances")
+    def _nitter_instances_single_to_list(cls, v):
+        if not isinstance(v, list):
+            v = [v]
+        return v
 
     def _get_random_nitter_instance(self) -> str:
         """Retrieve a random Nitter instance URL from the 'nitter_instances' list."""
@@ -48,9 +54,11 @@ class Pnytter(pydantic.BaseModel):
         )
 
     def find_user(self, username: str) -> Optional[TwitterProfile]:
+        """Get the information of a Twitter user, given its public username. If the profile does not exist, return None.
+        :param username: Twitter profile username (example: "@jack")
+        """
         html = self._request_nitter(
             endpoint=username,
             ignore_statuscodes=[404],
         )
-        parser = NitterParser(html)
-        return parser.get_profile()
+        return NitterParser(html).get_profile()
