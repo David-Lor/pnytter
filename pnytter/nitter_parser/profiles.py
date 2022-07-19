@@ -2,19 +2,11 @@ import fnmatch
 import datetime
 from typing import Optional
 
-from bs4 import BeautifulSoup
+from .base import BaseNitterParser
+from ..models import TwitterProfile, TwitterURL
 
-from .models import TwitterProfile, TwitterURL
 
-
-class NitterParser:
-    def __init__(self, data: str):
-        """
-        :param data: Nitter HTML source to parse
-        """
-        self.data = data
-        self.soup = BeautifulSoup(self.data, "html")
-
+class NitterProfilesParser(BaseNitterParser):
     def get_profile(self) -> Optional[TwitterProfile]:
         if self._is_profile_notfound():
             return None
@@ -61,10 +53,9 @@ class NitterParser:
 
     def _get_profile_join_datetime(self) -> datetime.datetime:
         value = self.soup.find("div", class_="profile-joindate").find("span").get("title")
-
         # Example: '8:50 PM - 21 Mar 2006'
-        datetime_format = "%I:%M %p - %d %b %Y"
 
+        datetime_format = "%I:%M %p - %d %b %Y"
         return datetime.datetime.strptime(value, datetime_format).replace(tzinfo=datetime.timezone.utc)
 
     def _get_profile_stats(self) -> TwitterProfile.Stats:
@@ -75,17 +66,15 @@ class NitterParser:
         likes = ul.find("li", class_="likes").text
 
         return TwitterProfile.Stats(
-            tweets=posts,  # noqa
-            following=following,  # noqa
-            followers=followers,  # noqa
-            likes=likes,  # noqa
+            tweets=posts,
+            following=following,
+            followers=followers,
+            likes=likes,
         )
 
     def _get_profile_pictures(self) -> TwitterProfile.Pictures:
         pic_profile_src = self.soup.find("a", class_="profile-card-avatar").get("href")
-
-        pic_banner_div = self.soup.find("div", class_="profile-banner")
-        pic_banner_src = pic_banner_div.find("a").get("href")
+        pic_banner_src = self.soup.find("div", class_="profile-banner").find("a").get("href")
 
         return TwitterProfile.Pictures(
             profile=TwitterURL.from_nitter_path(pic_profile_src),
@@ -97,6 +86,7 @@ class NitterParser:
         banner_path = pictures.banner.twitter_url.path
         # if banner_path="/profile_banners/12/1584998840/1500x500"
         # then profile_id="12"
+
         banner_path_chunks = banner_path.split("/")
         chunk_index = banner_path_chunks.index("profile_banners") + 1
         return banner_path_chunks[chunk_index]
