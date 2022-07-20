@@ -18,6 +18,7 @@ class TwitterProfile(BasePnytterModel):
 
         @pydantic.validator("*", pre=True)
         def _clear_string(cls, v):
+            """Clear all non-numeric characters from all the attributes, if given as string."""
             if isinstance(v, str):
                 v = re.sub("[^0-9]", "", v)
             return v
