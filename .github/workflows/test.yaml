@@ -1,0 +1,81 @@
+name: Test
+
+on:
+  workflow_dispatch: {}
+  push:
+    paths:
+      - pnytter
+      - tests
+      - .github/workflows/test.yaml
+
+jobs:
+  Test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    env:
+      GithubRunnerIP: "172.17.0.1"
+      RedisPort: "6379"
+      NitterPort: "8080"
+      NitterConfigPath: "/tmp/nitter.conf"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Write Nitter config
+        uses: DamianReeves/write-file-action@a432935930b2e351ec2d2792fc220717b656ec1c
+        with:
+          path: ${{ env.NitterConfigPath }}
+          contents: |-
+            [Server]
+            address = "0.0.0.0"
+            port = ${{ env.NitterPort }}
+            https = false
+            staticDir = "./public"
+            title = "nitter"
+            hostname = "localhost"
+            [Cache]
+            redisHost = "${{ env.GithubRunnerIP }}"
+            redisPort = 6379
+            [Config]
+            hmacKey = "123456"
+            base64Media = false
+            enableRSS = false
+            enableDebug = false
+            tokenCount = 1
+            [Preferences]
+            theme = "Nitter"
+            hlsPlayback = false
+            infiniteScroll = false
+
+      - name: Start Redis & Nitter
+        run: |-
+          docker run -d --name=redis --restart=unless-stopped -p ${{ env.RedisPort }}:6379 redis &
+          docker run -d --name=nitter --restart=unless-stopped -v /tmp/nitter.conf:/src/nitter.conf --net=host zedeus/nitter:latest &
+
+      - name: Install wait-for-it
+        run: sudo apt-get install -yq wait-for-it
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install Python requirements
+        run: pip install -r requirements.txt -r requirements-test.txt
+
+      - name: Wait for Redis
+        run: |-
+          failed=0
+          wait-for-it -h ${{ env.GithubRunnerIP }} -p ${{ env.RedisPort }} -t 60 || failed=1
+          test $failed -eq 0 || (docker logs redis && exit 1)
+      - name: Wait for Nitter
+        run: |-
+          failed=0
+          wait-for-it -h ${{ env.GithubRunnerIP }} -p ${{ env.NitterPort }} -t 60 || failed=1
+          w4i=$?
+          test $failed -eq 0 || (docker logs nitter && exit 1)
+
+      - name: Run tests
+        run: pytest -sv .
+        env:
+          TEST_NITTER_INSTANCES: "http://${{ env.GithubRunnerIP }}:${{ env.NitterPort }}"
