@@ -19,6 +19,9 @@ class Pnytter(pydantic.BaseModel):
     """List of the Nitter instances to use. Each instance must be given as the base URL of the Nitter server.
     At least one instance is required."""
 
+    beautifulsoup_parser: str = "html.parser"
+    """BeautifulSoup parser to use for parsing Nitter's HTML."""
+
     request_timeout: float = pydantic.Field(default=10, ge=0)
     """Timeout in seconds for HTTP requests."""
 
@@ -81,7 +84,10 @@ class Pnytter(pydantic.BaseModel):
             endpoint=username,
             ignore_statuscodes=[404],
         )
-        return NitterParser(html).get_profile()
+        return NitterParser(
+            parser=self.beautifulsoup_parser,
+            html=html,
+        ).get_profile()
 
     def get_user_tweets(
             self,
@@ -115,7 +121,10 @@ class Pnytter(pydantic.BaseModel):
                 params=params,
             )
 
-            parser = NitterParser(html)
+            parser = NitterParser(
+                parser=self.beautifulsoup_parser,
+                html=html,
+            )
             tweets = parser.get_tweets_from_searchpage()
             if not tweets:
                 return

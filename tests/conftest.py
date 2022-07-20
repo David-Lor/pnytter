@@ -19,4 +19,5 @@ def pnytter():
     settings = PnytterTestsSettings()
     return Pnytter(
         nitter_instances=settings.nitter_instances,
+        beautifulsoup_parser="lxml",
     )
