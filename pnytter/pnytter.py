@@ -17,7 +17,7 @@ class Pnytter(pydantic.BaseModel):
 
     nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl] = pydantic.Field(..., min_items=1)
     """List of the Nitter instances to use. Each instance must be given as the base URL of the Nitter server.
-    At least one instance is required."""
+    At least one instance is required. Instances may be repeated for increasing their chances."""
 
     beautifulsoup_parser: str = "html.parser"
     """BeautifulSoup parser to use for parsing Nitter's HTML."""
@@ -30,6 +30,10 @@ class Pnytter(pydantic.BaseModel):
         if not isinstance(v, list):
             v = [v]
         return v
+
+    @property
+    def nitter_instances_unique(self):
+        return set(str(instance) for instance in self.nitter_instances)
 
     def _get_random_nitter_instance(self) -> str:
         """Retrieve a random Nitter instance URL from the 'nitter_instances' list."""
@@ -59,12 +63,14 @@ class Pnytter(pydantic.BaseModel):
             endpoint: str,
             params: Optional[dict] = None,
             method: str = "GET",
-            ignore_statuscodes: Optional[Collection[int]] = None
+            ignore_statuscodes: Optional[Collection[int]] = None,
+            nitter_instance: Optional[str] = None,
     ) -> str:
         """Perform an HTTP request to Nitter, for the given endpoint.
         This method chooses a random Nitter instance to use for the request."""
-        nitter_instance = self._get_random_nitter_instance()
+        nitter_instance = nitter_instance if nitter_instance else self._get_random_nitter_instance()
         url = url_path_join(nitter_instance, endpoint)
+
         return self._raw_request(
             method=method,
             url=url,
@@ -143,3 +149,30 @@ class Pnytter(pydantic.BaseModel):
             tweets.extend(tweets_page)
 
         return tweets
+
+    def get_tweet(
+            self,
+            tweet_id: Union[str, int],
+            search_all_instances: bool = False,
+    ) -> Optional[TwitterTweet]:
+        """Get a single Tweet by its id. Return the TwitterTweet object, or None if tweet not found.
+        The tweet may be not found because the Nitter instance runs on a region where the tweet is blocked.
+        The 'search_all_instances' parameter can be set to True for searching the tweet in all the configured instances
+        until found in one."""
+        nitter_instances = self.nitter_instances_unique if search_all_instances else [None]
+        endpoint = f"/_/status/{tweet_id}"
+
+        for nitter_instance in nitter_instances:
+            html = self._request_nitter(
+                endpoint=endpoint,
+                nitter_instance=nitter_instance,
+                ignore_statuscodes=[404],
+            )
+
+            tweet = NitterParser(
+                parser=self.beautifulsoup_parser,
+                html=html,
+            ).get_tweet_from_tweetpage()
+
+            if tweet:
+                return tweet

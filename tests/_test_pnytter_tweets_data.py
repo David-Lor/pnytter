@@ -1,5 +1,6 @@
 import datetime
 import math
+import base64
 
 from pnytter import TwitterTweet
 from pnytter.utils import Const
@@ -157,3 +158,14 @@ class GetTweetsYearprogress:
                                     created_on=datetime.datetime(2022, 1, 4, 16, 0, tzinfo=datetime.timezone.utc),
                                     text='░░░░░░░░░░░░░░░ 1%')]
     expected_pages = math.ceil(len(expected_result) / Const.Nitter.tweets_per_page)
+
+
+NonExistingTweetId = "1549959479621324805"
+
+
+GermanyBlockedTweet = TwitterTweet(
+    tweet_id=1168900522092441600,
+    author='ShahakShapira',
+    created_on=datetime.datetime(2019, 9, 3, 14, 56, tzinfo=datetime.timezone.utc),
+    text=base64.b64decode(b'S2lzcyBteSBibGFjayBhc3MgaWhyIEZhc2Noby3DnGJlcnNlaGVyLg==').decode()
+)

@@ -11,6 +11,19 @@ from ..utils import Utils
 
 class NitterTweetsParser(BaseNitterParser):
 
+    def get_tweet_from_tweetpage(self) -> Optional[TwitterTweet]:
+        if self._get_error() == "Tweet not found":
+            return None
+
+        div_maintweet = self.soup.find("div", class_="main-tweet")
+        if SearchpageTweetbodyParser.get_unavailable_reason(div_maintweet):
+            # TODO Differenciate between tweet not found and unavailable? Current versions of Nitter always return "Unavailable" and not false NotFounds?
+            return None
+
+        div_maintweet_tweetbody = div_maintweet.find("div", class_="tweet-body")
+
+        return SearchpageTweetbodyParser(div_maintweet_tweetbody).get_tweet()
+
     def get_tweets_from_searchpage(self) -> List[TwitterTweet]:
         tweets_divs = self.soup.find_all("div", class_="tweet-body")
         return [self._parse_tweet_from_searchpage_div(div) for div in tweets_divs]
@@ -73,3 +86,9 @@ class SearchpageTweetbodyParser:
 
     def _get_text(self) -> str:
         return self.soup.find("div", class_="tweet-content").text
+
+    @staticmethod
+    def get_unavailable_reason(div_maintweet) -> Optional[str]:
+        div = div_maintweet.find("div", class_="unavailable-box")
+        if div:
+            return div.text

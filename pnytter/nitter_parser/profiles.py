@@ -73,6 +73,7 @@ class NitterProfilesParser(BaseNitterParser):
         )
 
     def _get_profile_pictures(self) -> TwitterProfile.Pictures:
+        # TODO Failing for certain instances (nitter.domain.glass)
         pic_profile_src = self.soup.find("a", class_="profile-card-avatar").get("href")
         pic_banner_src = self.soup.find("div", class_="profile-banner").find("a").get("href")
 
