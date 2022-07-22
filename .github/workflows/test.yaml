@@ -4,8 +4,8 @@ on:
   workflow_dispatch: {}
   push:
     paths:
-      - pnytter
-      - tests
+      - pnytter/**
+      - tests/**
       - .github/workflows/test.yaml
 
 jobs:
