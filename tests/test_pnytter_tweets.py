@@ -78,10 +78,9 @@ def test_get_unavailable_tweet_multiple_instances(pnytter):
     pnytter.nitter_instances = [
         # German instances
         "https://nitter.pussthecat.org",
-        "https://nitter.nixnet.services",
+        "https://nitter.grimneko.de",
         # Other instances
-        "https://nitter.1d4.us",
-        "https://nitter.unixfox.eu",
+        "https://nitter.ca",
     ]
 
     # TODO Capture requests performed and assert the instances requested
