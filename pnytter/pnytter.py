@@ -8,6 +8,7 @@ from urljoin import url_path_join
 
 from .nitter_parser import NitterParser
 from .models import TwitterProfile, TwitterTweet
+from .exceptions import NoNitterInstancesDefinedError
 from .utils import Utils
 
 __all__ = ("Pnytter",)
@@ -15,18 +16,18 @@ __all__ = ("Pnytter",)
 
 class Pnytter(pydantic.BaseModel):
     """Main Pnytter class, with all the Pnytter features as public methods.
-
-    Required attributes for initialization are:
-
-    - 'nitter_instances'
     """
 
-    nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl] = pydantic.Field(..., min_items=1)
+    nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl] = []
     """List of the Nitter instances to use. Each instance must be given as the base URL of the Nitter server.
     At least one instance is required, in which case can be given plain (without a list).
 
+    The Pnytter class can be initialized providing no `nitter_instances`. However, the NoNitterInstancesDefinedError
+    will be raised when calling a class method that requires requesting Nitter, if no instances are set.
+    The `add_instance` method can be used for adding instances after initializing the Pnytter class.
+
     Instances may be repeated for increasing their chances;
-    when all the instances must be used (like in 'get_tweet' with 'search_all_instances=True')
+    when all the instances must be used (like in `get_tweet` with `search_all_instances=True`)
     the repeated elements are ignored for querying.
     """
 
@@ -35,8 +36,11 @@ class Pnytter(pydantic.BaseModel):
     """
 
     request_timeout: float = pydantic.Field(default=10, ge=0)
-    """Timeout in seconds for HTTP requests.
+    """Timeout in seconds (allowing decimals) for HTTP requests (default: 10, allows decimals).
     """
+
+    class Config(pydantic.BaseConfig):
+        validate_assignment = True
 
     @pydantic.validator("nitter_instances")
     def _nitter_instances_single_to_list(cls, v):
@@ -56,6 +60,10 @@ class Pnytter(pydantic.BaseModel):
         """Retrieve a random Nitter instance URL from the 'nitter_instances' list.
         """
         return random.choice(self.nitter_instances)
+
+    def _validate_instances_available(self):
+        if not self.nitter_instances:
+            raise NoNitterInstancesDefinedError
 
     def _raw_request(
             self,
@@ -88,6 +96,7 @@ class Pnytter(pydantic.BaseModel):
         """Perform an HTTP request to Nitter, for the given endpoint.
         This method chooses a random Nitter instance to use for the request, unless one specifically given.
         """
+        self._validate_instances_available()
         nitter_instance = nitter_instance if nitter_instance else self._get_random_nitter_instance()
         url = url_path_join(nitter_instance, endpoint)
 
@@ -98,14 +107,24 @@ class Pnytter(pydantic.BaseModel):
             ignore_statuscodes=ignore_statuscodes or (),
         )
 
+    def add_instance(self, instance_url: str, times: int = 1):
+        """Add a Nitter instance for usage.
+
+        :param instance_url: Nitter instance URL.
+        :param times: how many times to repeat the instance (default: 1).
+        """
+        for _ in range(times):
+            # noinspection PyTypeChecker
+            self.nitter_instances.append(instance_url)
+
     def find_user(
             self,
             username: str
     ) -> Optional[TwitterProfile]:
         """Get the information of a Twitter user, given its public username. If the profile does not exist, return None.
 
-        :param username: Twitter profile username (example: "@jack")
-        :return: TwitterProfile if found; None if not found
+        :param username: Twitter profile username (example: "@jack").
+        :return: TwitterProfile if found; None if not found.
         """
         username = Utils.clean_username(username)
         html = self._request_nitter(
@@ -185,9 +204,9 @@ class Pnytter(pydantic.BaseModel):
         The Tweet may be not found because the Nitter instance runs on a region where the Tweet is blocked;
         the 'search_all_instances' parameter can be set to True for trying lookup in all configured instances.
 
-        :param tweet_id: Tweet ID
-        :param search_all_instances: if True, searching the tweet in all the configured instances until found in one
-        :return: TwitterTweet if found; None if not found or unavailable where used Nitter instance is hosted
+        :param tweet_id: Tweet ID.
+        :param search_all_instances: if True, searching the tweet in all the configured instances until found in one.
+        :return: TwitterTweet if found; None if not found or unavailable where used Nitter instance is hosted.
         """
         nitter_instances = self.nitter_instances_unique if search_all_instances else [None]
         endpoint = f"/_/status/{tweet_id}"
