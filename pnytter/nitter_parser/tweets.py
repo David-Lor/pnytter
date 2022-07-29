@@ -59,6 +59,7 @@ class SearchpageTweetbodyParser:
         author = self._get_author()
         tweetid, creationdate = self._get_tweetid_creationdate()
         text = self._get_text()
+        stats = self._get_stats()
 
         # noinspection PyTypeChecker
         return TwitterTweet(
@@ -66,6 +67,7 @@ class SearchpageTweetbodyParser:
             author=author,
             created_on=creationdate,
             text=text,
+            stats=stats,
         )
 
     def _get_author(self) -> str:
@@ -86,6 +88,22 @@ class SearchpageTweetbodyParser:
 
     def _get_text(self) -> str:
         return self.soup.find("div", class_="tweet-content").text
+
+    def _get_stats(self) -> TwitterTweet.Stats:
+        div = self.soup.find("div", class_="tweet-stats")
+
+        comments = div.find("span", class_="icon-comment").text
+        retweets = div.find("span", class_="icon-retweet").text
+        quotes = div.find("span", class_="icon-quote").text
+        likes = div.find("span", class_="icon-heart").text
+
+        # noinspection PyTypeChecker
+        return TwitterTweet.Stats(
+            comments=comments,
+            retweets=retweets,
+            quotes=quotes,
+            likes=likes,
+        )
 
     @staticmethod
     def get_unavailable_reason(div_maintweet) -> Optional[str]:
