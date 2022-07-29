@@ -100,7 +100,7 @@ from pnytter import TwitterProfile, TwitterURL
         id="non existing",
     ),
 ])
-def test_find_user(pnytter, username, expected_result):
+def test_find_user(pnytter, username: str, expected_result: TwitterProfile):
     result = pnytter.find_user(username)
     if expected_result is None:
         assert result is None

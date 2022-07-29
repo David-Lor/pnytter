@@ -37,10 +37,12 @@ def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, e
         tweets_results.extend(page_results)
 
     assert len(pages_results) == expected_pages
-    assert tweets_results == expected_tweets
+    for i, tweet_result in enumerate(tweets_results):
+        expected_tweet = expected_tweets[i]
+        _assert_tweet(expected=expected_tweet, actual=tweet_result, assert_stats=True)
 
-    tweets_results = pnytter.get_user_tweets_list(*args)
-    assert tweets_results == expected_tweets
+    user_tweets_results = pnytter.get_user_tweets_list(*args)
+    assert user_tweets_results == tweets_results
 
 
 @pytest.mark.parametrize("tweet_id, expected_tweet", [
@@ -60,7 +62,7 @@ def test_get_single_tweet(pnytter, tweet_id: str, expected_tweet: TwitterTweet):
         tweet_id = expected_tweet.tweet_id
 
     result = pnytter.get_tweet(tweet_id, search_all_instances=True)
-    assert result == expected_tweet
+    _assert_tweet(expected=expected_tweet, actual=result, assert_stats=True)
 
 
 def test_get_unavailable_tweet_single_instance(pnytter):
@@ -86,4 +88,21 @@ def test_get_unavailable_tweet_multiple_instances(pnytter):
     # TODO Capture requests performed and assert the instances requested
 
     result = pnytter.get_tweet(GermanyBlockedTweet.tweet_id, search_all_instances=True)
-    assert result == GermanyBlockedTweet
+    _assert_tweet(actual=result, expected=GermanyBlockedTweet)
+
+
+def _assert_tweet(actual: TwitterTweet, expected: TwitterTweet, assert_as_is: bool = False, assert_stats: bool = False):
+    if assert_as_is or (expected is None or actual is None):
+        assert actual == expected
+        return
+
+    assert expected.dict(exclude={"stats"}) == actual.dict(exclude={"stats"})
+    if assert_stats:
+        _assert_tweet_stats(actual.stats, expected.stats)
+
+
+def _assert_tweet_stats(actual: TwitterTweet.Stats, expected: TwitterTweet.Stats):
+    actual_dict = actual.dict()
+    for k, expected_value in expected.dict().items():
+        actual_value = actual_dict[k]
+        assert pytest.approx(actual_value, rel=100) == expected_value
