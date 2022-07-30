@@ -64,12 +64,13 @@ pprint.pp(user.dict())
 # Find user tweets during a date range
 tweets = pnytter.get_user_tweets_list("year_progress", filter_from="2022-06-01", filter_to="2022-06-25")
 pprint.pp(tweets)
-# [TwitterTweet(tweet_id=1539246778041745409, author='year_progress', created_on=datetime.datetime(2022, 6, 21, 14, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 47%'),
-#  TwitterTweet(tweet_id=1537918020118491136, author='year_progress', created_on=datetime.datetime(2022, 6, 17, 22, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 46%'),
-#  TwitterTweet(tweet_id=1536589258370297856, author='year_progress', created_on=datetime.datetime(2022, 6, 14, 6, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 45%'),
-#  TwitterTweet(tweet_id=1535275600482816000, author='year_progress', created_on=datetime.datetime(2022, 6, 10, 15, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 44%'),
-#  TwitterTweet(tweet_id=1533946844497199104, author='year_progress', created_on=datetime.datetime(2022, 6, 6, 23, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓░░░░░░░░░ 43%'),
-#  TwitterTweet(tweet_id=1532633192020205570, author='year_progress', created_on=datetime.datetime(2022, 6, 3, 8, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓░░░░░░░░░ 42%')]
+# [TwitterTweet(tweet_id=1539246778041745409, author='year_progress', created_on=datetime.datetime(2022, 6, 21, 14, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 47%', stats=Stats(comments=29, retweets=1066, quotes=113, likes=5497)),
+#  TwitterTweet(tweet_id=1537918020118491136, author='year_progress', created_on=datetime.datetime(2022, 6, 17, 22, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 46%', stats=Stats(comments=26, retweets=984, quotes=102, likes=5866)),
+#  TwitterTweet(tweet_id=1536589258370297856, author='year_progress', created_on=datetime.datetime(2022, 6, 14, 6, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 45%', stats=Stats(comments=40, retweets=1490, quotes=144, likes=7543)),
+#  TwitterTweet(tweet_id=1535275600482816000, author='year_progress', created_on=datetime.datetime(2022, 6, 10, 15, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 44%', stats=Stats(comments=21, retweets=937, quotes=95, likes=5879)),
+#  TwitterTweet(tweet_id=1533946844497199104, author='year_progress', created_on=datetime.datetime(2022, 6, 6, 23, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓░░░░░░░░░ 43%', stats=Stats(comments=42, retweets=1090, quotes=121, likes=7327)),
+# TwitterTweet(tweet_id=1532633192020205570, author='year_progress', created_on=datetime.datetime(2022, 6, 3, 8, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓░░░░░░░░░ 42%', stats=Stats(comments=31, retweets=1152, quotes=165, likes=7021))]
+
 
 
 # Find single tweet
@@ -78,7 +79,8 @@ pprint.pp(tweet.dict())
 # {'tweet_id': 1539246778041745409,
 #  'author': 'year_progress',
 #  'created_on': datetime.datetime(2022, 6, 21, 14, 0, tzinfo=datetime.timezone.utc),
-#  'text': '▓▓▓▓▓▓▓░░░░░░░░ 47%'}
+#  'text': '▓▓▓▓▓▓▓░░░░░░░░ 47%',
+#  'stats': {'comments': 29, 'retweets': 1066, 'quotes': 113, 'likes': 5497}}
 ```
 
 ## Known issues
@@ -95,6 +97,8 @@ pprint.pp(tweet.dict())
 
 Versions 0.y.z are expected to be unstable, and the API may change on Minor (y) releases.
 
+- ...
+  - Get tweet stats (count of comments, retweets, quotes, likes)
 - 0.0.1
   - Initial release:
     - Get profile by username: id, username, fullname, biography, verified, when joined, stats (count of tweets, following, followers, likes), pictures (profile, banner)
