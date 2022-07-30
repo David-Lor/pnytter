@@ -61,7 +61,9 @@ jobs:
         with:
           python-version: "3.9"
       - name: Install Python requirements
-        run: pip install -r requirements.txt -r requirements-test.txt
+        run: |-
+          pip install poetry==1.2.0b2
+          poetry install --no-root --with test
 
       - name: Wait for Redis
         run: |-
