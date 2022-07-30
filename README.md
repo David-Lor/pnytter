@@ -38,9 +38,15 @@ Package support is pending.
 from pnytter import Pnytter
 import pprint
 
+# The Pnytter object needs at least 1 Nitter instance to work, but these can be added after initialization
 pnytter = Pnytter(
-  nitter_instances=["https://nitter.net", "https://nitter.pussthecat.org"]
+  nitter_instances=["https://nitter.net"]
 )
+
+# Method to add instances to a Pnytter object. The `times` kwarg repeats the instance to increase its chances of being used
+pnytter.add_instance("https://nitter.pussthecat.org", times=2)
+
+
 
 # Find the data from a single user
 user = pnytter.find_user("jack")
@@ -99,6 +105,7 @@ Versions 0.y.z are expected to be unstable, and the API may change on Minor (y) 
 
 - ...
   - Get tweet stats (count of comments, retweets, quotes, likes)
+  - Allow configuring Nitter instances after Pnytter initialization
 - 0.0.1
   - Initial release:
     - Get profile by username: id, username, fullname, biography, verified, when joined, stats (count of tweets, following, followers, likes), pictures (profile, banner)
