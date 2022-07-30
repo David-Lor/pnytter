@@ -20,10 +20,3 @@ class BasePnytterStats(BasePnytterModel):
         if isinstance(v, str):
             v = re.sub("[^0-9]", "", v)
         return v
-
-    @pydantic.validator("*", pre=True, allow_reuse=True)
-    def _empty_string_as_zero(cls, v):
-        """If a string is empty, set its value to 0."""
-        if isinstance(v, str) and not v.strip():
-            v = 0
-        return v
