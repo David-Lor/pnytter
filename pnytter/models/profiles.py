@@ -1,27 +1,20 @@
-import re
 import datetime
 
 import pydantic
 
-from .base import BasePnytterModel, NEString, PosInt
+from .base import BasePnytterModel, BasePnytterStats, NEString, PosInt
 from .generic import TwitterURL
 
 __all__ = ("TwitterProfile",)
 
 
 class TwitterProfile(BasePnytterModel):
-    class Stats(BasePnytterModel):
+
+    class Stats(BasePnytterStats):
         tweets: int = PosInt
         following: int = PosInt
         followers: int = PosInt
         likes: int = PosInt
-
-        @pydantic.validator("*", pre=True)
-        def _clear_string(cls, v):
-            """Clear all non-numeric characters from all the attributes, if given as string."""
-            if isinstance(v, str):
-                v = re.sub("[^0-9]", "", v)
-            return v
 
     class Pictures(BasePnytterModel):
         profile: TwitterURL
