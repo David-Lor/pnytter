@@ -58,6 +58,7 @@ jobs:
 
   TestRelease:
     name: Test Release
+    # TODO Remove first check
     if: ${{ github.event.inputs.test-repository == 'true' && github.event.inputs.test-package == 'true' }}
     runs-on: ubuntu-latest
     needs:
@@ -74,8 +75,9 @@ jobs:
         run: |-
           rm -rf pnytter
 
+      # TODO allow testing from production index
       - name: Install pnytter package
-        run: pip install --index-url="https://test.pypi.org/legacy/" "pnytter==${{ github.event.inputs.version }}"
+        run: pip install --index-url="https://test.pypi.org/simple/" "pnytter==${{ github.event.inputs.version }}"
       - name: Install test requirements
         run: pip install -r requirements-test.txt
 
