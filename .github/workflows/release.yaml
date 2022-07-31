@@ -31,21 +31,21 @@ jobs:
           python-version: "3.9"
 
       - name: Set version
-        run: echo "VERSION=${{ github.event.inputs.version }} >> $GITHUB_ENV
+        run: echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
       - name: Validate version
-        run: test "${{ env.VERSION }}
+        run: test "${{ env.VERSION }}"
 
       - name: Set PyPI repository/token (production)
         if: ${{ github.event.inputs.test-repository == 'false' }}
         run: |-
           echo "PYPI_REPOSITORY=https://pypi.python.org/simple/" >> $GITHUB_ENV
-          echo "PYPI_TOKEN=${{ secrets.PYPI_TOKEN }} >> $GITHUB_ENV
+          echo "PYPI_TOKEN=${{ secrets.PYPI_TOKEN }}" >> $GITHUB_ENV
 
       - name: Set PyPI repository/token (test)
         if: ${{ github.event.inputs.test-repository == 'true' }}
         run: |-
           echo "PYPI_REPOSITORY=https://test.pypi.org/legacy/" >> $GITHUB_ENV
-          echo "PYPI_TOKEN=${{ secrets.PYPI_TEST_TOKEN }} >> $GITHUB_ENV
+          echo "PYPI_TOKEN=${{ secrets.PYPI_TEST_TOKEN }}" >> $GITHUB_ENV
 
       - name: Build package
         run: python setup.py sdist
