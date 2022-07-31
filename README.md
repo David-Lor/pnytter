@@ -24,7 +24,7 @@ The features are bound to the development of my [twitterscraper](https://github.
 
 ## Requirements
 
-- Python >= 3.6
+- Python >= 3.7
 - Requirements listed on [requirements.txt](requirements.txt)
 - A hosted Nitter instance is recommeded for intensive use, to avoid overloading the public instances
 
