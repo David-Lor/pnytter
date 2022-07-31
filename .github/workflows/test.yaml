@@ -7,6 +7,7 @@ on:
       - pnytter/**
       - tests/**
       - .github/workflows/test.yaml
+      - requirements*.txt
 
 jobs:
   Test:
