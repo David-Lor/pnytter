@@ -13,10 +13,12 @@ if version_file and not version:
 if not version:
     raise Exception("No version found")
 
+with open("README.md", "r") as f:
+    readme_content = f.read()
+
 
 setup(
     name="pnytter",
-    version=version,
     license="ISC",
     author="David Lorenzo",
     author_email="17401854+David-Lor@users.noreply.github.com",
@@ -33,5 +35,9 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10"
-    ]
+    ],
+    long_description_content_type="text/markdown",
+
+    version=version,
+    long_description=readme_content,
 )
