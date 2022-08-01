@@ -100,9 +100,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.9"
-      - name: Remote pnytter src directory
-        run: |-
-          rm -rf pnytter
 
       - name: Install pnytter requirements from main PyPI repository
         run: pip install -r requirements.txt
@@ -113,7 +110,10 @@ jobs:
       - name: Install test requirements
         run: pip install -r requirements-test.txt
 
+      - name: Move tests directory
+        run: mv tests /tmp/pnytter-tests
       - name: Run tests
+        working-directory: /tmp/pnytter-tests
         run: pytest -sv .
         env:
           TEST_NITTER_INSTANCES: |-
