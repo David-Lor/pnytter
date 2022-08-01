@@ -30,6 +30,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10"
     ],
+    packages=["pnytter"],
     description_file="README.md",
     license_files=["LICENSE.md"],
     long_description_content_type="text/markdown",
