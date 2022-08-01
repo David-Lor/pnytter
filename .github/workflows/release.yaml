@@ -105,6 +105,9 @@ jobs:
         run: |-
           rm -rf pnytter
 
+      - name: Install pnytter requirements from main PyPI repository
+        run: pip install -r requirements.txt
+
       # TODO allow testing from production index
       - name: Install pnytter package
         run: pip install --index-url="https://test.pypi.org/simple/" "pnytter==${{ github.event.inputs.version }}"
