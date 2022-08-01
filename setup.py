@@ -3,15 +3,8 @@ import os
 from setuptools import setup, find_packages
 
 
-version_file = os.getenv("VERSION_FILE", "").strip()
-version = os.getenv("VERSION", "").strip()
+VERSION = "$VERSION$"
 
-if version_file and not version:
-    with open(version_file, "r") as f:
-        version = f.read().strip()
-
-if not version:
-    raise Exception("No version found")
 
 with open("README.md", "r") as f:
     readme_content = f.read()
@@ -40,6 +33,6 @@ setup(
     license_files=["LICENSE.md"],
     long_description_content_type="text/markdown",
 
-    version=version,
+    version=VERSION,
     long_description=readme_content,
 )

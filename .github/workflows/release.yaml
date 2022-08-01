@@ -35,6 +35,17 @@ jobs:
       - name: Validate version
         run: test "${{ env.VERSION }}"
 
+      - name: Override version in setup.py
+        shell: python
+        run: |-
+          FILE = "setup.py"
+          with open(FILE, "r") as f:
+            data = f.read()
+
+          data = data.replace("$VERSION$", "${{ github.event.inputs.version }}")
+          with open(FILE, "w") as f:
+            f.write(data)
+
       - name: Set PyPI repository/token (production)
         if: ${{ github.event.inputs.test-repository == 'false' }}
         run: |-
