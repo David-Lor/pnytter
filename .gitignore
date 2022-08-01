@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 dist/
+*.egg-info/
 *.env
 *pycache*
 .pytest_cache

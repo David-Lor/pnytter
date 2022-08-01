@@ -1,4 +1,3 @@
-import os
 # noinspection PyUnresolvedReferences
 from setuptools import setup, find_packages
 
@@ -9,6 +8,13 @@ VERSION = "$VERSION$"
 with open("README.md", "r") as f:
     readme_content = f.read()
 
+requirements = list()
+with open("requirements.txt", "r") as f:
+    for line in f.readlines():
+        line = line.split("#")[0].strip()
+        if line:
+            requirements.append(line)
+
 
 setup(
     name="pnytter",
@@ -18,7 +24,7 @@ setup(
     url="https://github.com/David-Lor/pnytter",
     download_url="https://github.com/David-Lor/pnytter/archive/main.zip",
     keywords=["twitter", "nitter", "scraper", "scraping"],
-    install_requires=[],
+    install_requires=requirements,
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
