@@ -1,6 +1,5 @@
-# noinspection PyUnresolvedReferences
-from setuptools import setup, find_packages
 import json
+from setuptools import setup, find_packages
 
 
 VERSION = "$VERSION$"
@@ -30,11 +29,11 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10"
     ],
-    packages=["pnytter"],
     description_file="README.md",
     license_files=["LICENSE.md"],
     long_description_content_type="text/markdown",
 
     version=VERSION,
     long_description=readme_content,
+    packages=find_packages(),
 )

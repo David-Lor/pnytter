@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 dist/
+build/
 *.egg-info/
 *.env
 *pycache*
