@@ -106,7 +106,13 @@ jobs:
 
       # TODO allow testing from production index
       - name: Install pnytter package
-        run: pip install --index-url="https://test.pypi.org/simple/" "pnytter==${{ github.event.inputs.version }}"
+        uses: nick-fields/retry@v2
+        with:
+          timeout_seconds: 30
+          max_attempts: 12
+          retry_wait_seconds: 5
+          retry_on: error
+          command: pip install --index-url="https://test.pypi.org/simple/" "pnytter==${{ github.event.inputs.version }}"
       - name: Install test requirements
         run: pip install -r requirements-test.txt
 
@@ -117,4 +123,4 @@ jobs:
         run: pytest -sv .
         env:
           TEST_NITTER_INSTANCES: |-
-            ["https://nitter.net", "https://nitter.pussthecat.org"]
+            ["https://nitter.pussthecat.org"]
