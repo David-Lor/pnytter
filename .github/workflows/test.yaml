@@ -7,11 +7,20 @@ on:
       - pnytter/**
       - tests/**
       - .github/workflows/test.yaml
+      - requirements*.txt
 
 jobs:
   Test:
-    name: Test
+    name: "[Python ${{ matrix.python-version }}] Test"
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # TODO Try running test for each version on same job without matrix, using virtualenvs
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
 
     env:
       GithubRunnerIP: "172.17.0.1"
@@ -59,7 +68,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.9"
+          python-version: ${{ matrix.python-version }}
       - name: Install Python requirements
         run: pip install -r requirements.txt -r requirements-test.txt
 

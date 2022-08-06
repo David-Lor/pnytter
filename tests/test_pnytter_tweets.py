@@ -2,7 +2,7 @@ import pytest
 
 from pnytter import TwitterTweet
 
-from ._test_pnytter_tweets_data import GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
+from tests._test_pnytter_tweets_data import GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
 
 
 @pytest.mark.parametrize("username, filter_from, filter_to, expected_pages, expected_tweets", [

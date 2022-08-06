@@ -8,6 +8,7 @@ from pnytter import Pnytter
 
 class PnytterTestsSettings(pydantic.BaseSettings):
     nitter_instances: Union[List[pydantic.AnyHttpUrl], pydantic.AnyHttpUrl]
+    beautifulsoup_parser: str = "lxml"
 
     class Config:
         env_prefix = "TEST_"
@@ -19,5 +20,5 @@ def pnytter():
     settings = PnytterTestsSettings()
     return Pnytter(
         nitter_instances=settings.nitter_instances,
-        beautifulsoup_parser="lxml",
+        beautifulsoup_parser=settings.beautifulsoup_parser,
     )
