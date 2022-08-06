@@ -103,7 +103,7 @@ pprint.pp(tweet.dict())
 
 Versions 0.y.z are expected to be unstable, and the API may change on Minor (y) releases.
 
-- ...
+- 0.1.1
   - Get tweet stats (count of comments, retweets, quotes, likes)
   - Allow configuring Nitter instances after Pnytter initialization
 - 0.0.1
