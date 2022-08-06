@@ -1,6 +1,9 @@
 .idea/
 .vscode/
-.env
+dist/
+build/
+*.egg-info/
+*.env
 *pycache*
 .pytest_cache
 *.pyc
