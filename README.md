@@ -30,7 +30,12 @@ The features are bound to the development of my [twitterscraper](https://github.
 
 ## Installing
 
-Package support is pending.
+Package available [at PyPI](https://pypi.org/project/pnytter/).
+
+```bash
+# Virtual environment recommended
+pip install pnytter
+```
 
 ## Usage
 
