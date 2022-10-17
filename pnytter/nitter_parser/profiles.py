@@ -46,7 +46,10 @@ class NitterProfilesParser(BaseNitterParser):
         return self.soup.find("a", class_="profile-card-fullname").text
 
     def _get_profile_biography(self) -> str:
-        return self.soup.find("div", class_="profile-bio").text
+        if self.soup.find("div", class_="profile-bio"):
+            return self.soup.find("div", class_="profile-bio").text
+        else:
+            return ""
 
     def _get_profile_verified(self) -> bool:
         return self.soup.find("span", class_="verified-icon") is not None
