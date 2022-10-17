@@ -100,7 +100,7 @@ from pnytter import TwitterProfile, TwitterURL
             id=14814846,
             username="nobio",
             fullname="Gernot",
-            biography="",
+            biography=None,
             verified=False,
             joined_datetime="2008-05-25T12:01:00Z",
             stats=TwitterProfile.Stats(
