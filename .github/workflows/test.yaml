@@ -3,11 +3,18 @@ name: Test
 on:
   workflow_dispatch: {}
   push:
+    branches:
+      - main
+      - develop
     paths:
       - pnytter/**
       - tests/**
       - .github/workflows/test.yaml
       - requirements*.txt
+  pull_request:
+    - opened
+    - reopened
+    - synchronize
 
 jobs:
   Test:
