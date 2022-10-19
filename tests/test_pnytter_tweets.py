@@ -2,25 +2,22 @@ import pytest
 
 from pnytter import TwitterTweet
 
-from tests._test_pnytter_tweets_data import GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
+from tests._test_pnytter_tweets_data import BaseGetTweetsScenario, GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
 
 
-@pytest.mark.parametrize("username, filter_from, filter_to, expected_pages, expected_tweets", [
+@pytest.mark.parametrize("scenario", [
     pytest.param(
-        GetTweetsYearprogress.username,
-        GetTweetsYearprogress.filter_from,
-        GetTweetsYearprogress.filter_to,
-        GetTweetsYearprogress.expected_pages,
-        GetTweetsYearprogress.expected_result,
+        GetTweetsYearprogress,
         id=f"@{GetTweetsYearprogress.username}",
     )
 ])
-def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, expected_tweets):
+def test_get_tweets(pnytter, scenario: BaseGetTweetsScenario):
     args = (
-        username,
-        filter_from,
-        filter_to,
+        scenario.username,
+        scenario.filter_from,
+        scenario.filter_to,
     )
+    expected_pages = scenario.get_expected_pages()
     generator = pnytter.get_user_tweets(*args)
 
     pages_results = list()
@@ -38,7 +35,7 @@ def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, e
 
     assert len(pages_results) == expected_pages
     for i, tweet_result in enumerate(tweets_results):
-        expected_tweet = expected_tweets[i]
+        expected_tweet = scenario.expected_tweets[i]
         _assert_tweet(expected=expected_tweet, actual=tweet_result, assert_stats=True)
 
     user_tweets_results = pnytter.get_user_tweets_list(*args)
@@ -48,8 +45,8 @@ def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, e
 @pytest.mark.parametrize("tweet_id, expected_tweet", [
     pytest.param(
         None,
-        GetTweetsYearprogress.expected_result[0],
-        id=str(GetTweetsYearprogress.expected_result[0].tweet_id),
+        GetTweetsYearprogress.expected_tweets[0],
+        id=str(GetTweetsYearprogress.expected_tweets[0].tweet_id),
     ),
     pytest.param(
         NonExistingTweetId,
