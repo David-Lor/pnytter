@@ -95,6 +95,35 @@ from pnytter import TwitterProfile, TwitterURL
         id="@PossumEveryHour",
     ),
     pytest.param(
+        "nobio",
+        TwitterProfile(
+            id=14814846,
+            username="nobio",
+            fullname="Gernot",
+            biography="",
+            verified=False,
+            joined_datetime="2008-05-25T12:01:00Z",
+            stats=TwitterProfile.Stats(
+                # at 2022-07-18, decreased
+                tweets=17,
+                following=78,
+                followers=7,
+                likes=27,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=TwitterURL(
+                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1022090933343608833%2FxZvdXf7E.jpg",
+                    twitter_url="https://pbs.twimg.com/profile_images/1022090933343608833/xZvdXf7E.jpg",
+                ),
+                banner=TwitterURL(
+                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F1022089486849765376%2F1546021838%2F1500x500",
+                    twitter_url="https://pbs.twimg.com/profile_banners/1022089486849765376/1546021838/1500x500",
+                ),
+            ),
+        ),
+        id="@nobio",
+    ),
+    pytest.param(
         str(uuid.uuid4()),
         None,
         id="non existing",
