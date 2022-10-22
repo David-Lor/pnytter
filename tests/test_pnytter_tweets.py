@@ -1,3 +1,5 @@
+from typing import List
+
 import pytest
 
 from pnytter import TwitterTweet
@@ -34,10 +36,13 @@ def test_get_tweets(pnytter, scenario: BaseGetTweetsScenario):
         tweets_results.extend(page_results)
 
     assert len(pages_results) == expected_pages
-    for i, tweet_result in enumerate(tweets_results):
-        expected_tweet = scenario.expected_tweets[i]
-        _assert_tweet(expected=expected_tweet, actual=tweet_result, assert_stats=True)
+    _assert_tweets(
+        actual=tweets_results,
+        expected=scenario.expected_tweets,
+        assert_stats=True,
+    )
 
+    # Compare result obtained from get_user_tweets_list() with result obtained from get_user_tweets() generator
     user_tweets_results = pnytter.get_user_tweets_list(*args)
     assert user_tweets_results == tweets_results
 
@@ -88,12 +93,28 @@ def test_get_unavailable_tweet_multiple_instances(pnytter):
     _assert_tweet(actual=result, expected=GermanyBlockedTweet)
 
 
+def _assert_tweets(actual: List[TwitterTweet], expected: List[TwitterTweet], assert_as_is: bool = False, assert_stats: bool = False):
+    actual_map = {tweet.tweet_id: tweet for tweet in actual}
+    expected_map = {tweet.tweet_id: tweet for tweet in expected}
+    assert sorted(list(actual_map.keys())) == sorted(list(expected_map.keys()))
+
+    for tweet_id, actual in actual_map.items():
+        expected = expected_map[tweet_id]
+        _assert_tweet(
+            actual=actual,
+            expected=expected,
+            assert_as_is=assert_as_is,
+            assert_stats=assert_stats,
+        )
+
+
 def _assert_tweet(actual: TwitterTweet, expected: TwitterTweet, assert_as_is: bool = False, assert_stats: bool = False):
     if assert_as_is or (expected is None or actual is None):
         assert actual == expected
         return
 
-    assert expected.dict(exclude={"stats"}) == actual.dict(exclude={"stats"})
+    excludes = {"stats"}
+    assert expected.dict(exclude=excludes) == actual.dict(exclude=excludes)
     if assert_stats:
         _assert_tweet_stats(actual.stats, expected.stats)
 
