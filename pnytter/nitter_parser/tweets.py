@@ -30,6 +30,8 @@ class NitterTweetsParser(BaseNitterParser):
 
     def get_searchpage_next_cursor(self) -> Optional[str]:
         div = self.soup.find("div", class_="show-more")
+        if not div:
+            return None
         href = div.find("a").get("href")
         # href example: ?f=tweets&cursor=scroll%3AthGAVUV0VFVBaCgLOdg_bM_yoWgoC9ufb4poErEnEV8IV6FYCJehgHREVGQVVMVDUBFQAVAAA%3D
 
