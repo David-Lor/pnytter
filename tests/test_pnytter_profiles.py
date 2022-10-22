@@ -3,13 +3,12 @@ import uuid
 import pytest
 import pydantic
 
-from pnytter import TwitterProfile, TwitterURL
+from pnytter import TwitterProfile
 
 
 class ProfileTestParams(pydantic.BaseModel):
     username: str
     assert_biography: bool = True
-    assert_pictures: bool = True
 
 
 # TODO Ignoring failures on this test because of failing profile pictures parsing.
@@ -35,16 +34,6 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=6410000,
                 likes=35000,
             ),
-            pictures=TwitterProfile.Pictures(
-                profile=TwitterURL(
-                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1115644092329758721%2FAFjOr-K8.jpg",
-                    twitter_url="https://pbs.twimg.com/profile_images/1115644092329758721/AFjOr-K8.jpg",
-                ),
-                banner=TwitterURL(
-                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F12%2F1584998840%2F1500x500",
-                    twitter_url="https://pbs.twimg.com/profile_banners/12/1584998840/1500x500",
-                ),
-            ),
         ),
         id="@jack",
     ),
@@ -52,7 +41,6 @@ class ProfileTestParams(pydantic.BaseModel):
         ProfileTestParams(
             username="elonmusk",
             assert_biography=False,
-            assert_pictures=False,
         ),
         TwitterProfile(
             id=44196397,
@@ -68,7 +56,6 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=101465000,
                 likes=13500,
             ),
-            pictures=TwitterProfile.Pictures.construct(),
         ),
         id="@elonmusk",
     ),
@@ -90,23 +77,12 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=571300,
                 likes=0,
             ),
-            pictures=TwitterProfile.Pictures(
-                profile=TwitterURL(
-                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1022090933343608833%2FxZvdXf7E.jpg",
-                    twitter_url="https://pbs.twimg.com/profile_images/1022090933343608833/xZvdXf7E.jpg",
-                ),
-                banner=TwitterURL(
-                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F1022089486849765376%2F1546021838%2F1500x500",
-                    twitter_url="https://pbs.twimg.com/profile_banners/1022089486849765376/1546021838/1500x500",
-                ),
-            ),
         ),
         id="@PossumEveryHour",
     ),
     pytest.param(
         ProfileTestParams(
             username="nobio",
-            assert_pictures=False,
         ),
         TwitterProfile(
             id=14814846,
@@ -122,7 +98,6 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=7,
                 likes=27,
             ),
-            pictures=TwitterProfile.Pictures.construct(),
         ),
         id="@nobio",
     ),
@@ -143,8 +118,6 @@ def test_find_user(pnytter, profile_test_params: ProfileTestParams, expected_res
     exclude_fields = {"stats"}
     if not profile_test_params.assert_biography:
         exclude_fields.add("biography")
-    if not profile_test_params.assert_pictures:
-        exclude_fields.add("pictures")
 
     result_data = result.dict(exclude=exclude_fields)
     expected_data = expected_result.dict(exclude=exclude_fields)
