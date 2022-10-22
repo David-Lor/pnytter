@@ -166,6 +166,7 @@ class Pnytter(pydantic.BaseModel):
 
         while True:
             html = self._request_nitter(
+                # TODO Use the same instance for all pages
                 endpoint=endpoint_base + endpoint_params,
                 params=params,
             )

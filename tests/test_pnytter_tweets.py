@@ -1,26 +1,28 @@
+from typing import List
+
 import pytest
 
 from pnytter import TwitterTweet
 
-from tests._test_pnytter_tweets_data import GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
+from tests._test_pnytter_tweets_data import BaseGetTweetsScenario, GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
 
 
-@pytest.mark.parametrize("username, filter_from, filter_to, expected_pages, expected_tweets", [
+# TODO Ignoring failures on this test, because of bug on Nitter causing search randomly missing tweets.
+#      Remove the pytest.mark.flaky when this gets fixed.
+@pytest.mark.flaky
+@pytest.mark.parametrize("scenario", [
     pytest.param(
-        GetTweetsYearprogress.username,
-        GetTweetsYearprogress.filter_from,
-        GetTweetsYearprogress.filter_to,
-        GetTweetsYearprogress.expected_pages,
-        GetTweetsYearprogress.expected_result,
+        GetTweetsYearprogress,
         id=f"@{GetTweetsYearprogress.username}",
     )
 ])
-def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, expected_tweets):
+def test_get_tweets(pnytter, scenario: BaseGetTweetsScenario):
     args = (
-        username,
-        filter_from,
-        filter_to,
+        scenario.username,
+        scenario.filter_from,
+        scenario.filter_to,
     )
+    expected_pages = scenario.get_expected_pages()
     generator = pnytter.get_user_tweets(*args)
 
     pages_results = list()
@@ -37,10 +39,13 @@ def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, e
         tweets_results.extend(page_results)
 
     assert len(pages_results) == expected_pages
-    for i, tweet_result in enumerate(tweets_results):
-        expected_tweet = expected_tweets[i]
-        _assert_tweet(expected=expected_tweet, actual=tweet_result, assert_stats=True)
+    _assert_tweets(
+        actual=tweets_results,
+        expected=scenario.expected_tweets,
+        assert_stats=True,
+    )
 
+    # Compare result obtained from get_user_tweets_list() with result obtained from get_user_tweets() generator
     user_tweets_results = pnytter.get_user_tweets_list(*args)
     assert user_tweets_results == tweets_results
 
@@ -48,8 +53,8 @@ def test_get_tweets(pnytter, username, filter_from, filter_to, expected_pages, e
 @pytest.mark.parametrize("tweet_id, expected_tweet", [
     pytest.param(
         None,
-        GetTweetsYearprogress.expected_result[0],
-        id=str(GetTweetsYearprogress.expected_result[0].tweet_id),
+        GetTweetsYearprogress.expected_tweets[0],
+        id=str(GetTweetsYearprogress.expected_tweets[0].tweet_id),
     ),
     pytest.param(
         NonExistingTweetId,
@@ -91,12 +96,28 @@ def test_get_unavailable_tweet_multiple_instances(pnytter):
     _assert_tweet(actual=result, expected=GermanyBlockedTweet)
 
 
+def _assert_tweets(actual: List[TwitterTweet], expected: List[TwitterTweet], assert_as_is: bool = False, assert_stats: bool = False):
+    actual_map = {tweet.tweet_id: tweet for tweet in actual}
+    expected_map = {tweet.tweet_id: tweet for tweet in expected}
+    assert sorted(list(actual_map.keys())) == sorted(list(expected_map.keys()))
+
+    for tweet_id, actual in actual_map.items():
+        expected = expected_map[tweet_id]
+        _assert_tweet(
+            actual=actual,
+            expected=expected,
+            assert_as_is=assert_as_is,
+            assert_stats=assert_stats,
+        )
+
+
 def _assert_tweet(actual: TwitterTweet, expected: TwitterTweet, assert_as_is: bool = False, assert_stats: bool = False):
     if assert_as_is or (expected is None or actual is None):
         assert actual == expected
         return
 
-    assert expected.dict(exclude={"stats"}) == actual.dict(exclude={"stats"})
+    excludes = {"stats"}
+    assert expected.dict(exclude=excludes) == actual.dict(exclude=excludes)
     if assert_stats:
         _assert_tweet_stats(actual.stats, expected.stats)
 
