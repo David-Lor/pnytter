@@ -12,9 +12,15 @@ on:
       - .github/workflows/test.yaml
       - requirements*.txt
   pull_request:
-    - opened
-    - reopened
-    - synchronize
+    types:
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - pnytter/**
+      - tests/**
+      - .github/workflows/test.yaml
+      - requirements*.txt
 
 jobs:
   Test:
