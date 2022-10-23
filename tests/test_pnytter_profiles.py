@@ -12,10 +12,7 @@ class ProfileTestParams(pydantic.BaseModel):
     assert_pictures: bool = True
 
 
-# TODO Ignoring failures on this test because of failing profile pictures parsing.
-#      Remove the pytest.mark.flaky when #7 gets fixed
 # noinspection PyTypeChecker
-@pytest.mark.flaky
 @pytest.mark.parametrize("profile_test_params, expected_result", [
     pytest.param(
         ProfileTestParams(
@@ -68,7 +65,7 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=101465000,
                 likes=13500,
             ),
-            pictures=TwitterProfile.Pictures.construct(),
+            pictures=TwitterProfile.Pictures(),
         ),
         id="@elonmusk",
     ),
@@ -109,12 +106,12 @@ class ProfileTestParams(pydantic.BaseModel):
             assert_pictures=False,
         ),
         TwitterProfile(
-            id=14814846,
+            id=None,
             username="nobio",
             fullname="Gernot",
             biography="",
             verified=False,
-            joined_datetime="2008-05-25T12:01:00Z",
+            joined_datetime="2008-05-17T21:30:00Z",
             stats=TwitterProfile.Stats(
                 # at 2022-10-17, decreased
                 tweets=17,
@@ -122,9 +119,34 @@ class ProfileTestParams(pydantic.BaseModel):
                 followers=7,
                 likes=27,
             ),
-            pictures=TwitterProfile.Pictures.construct(),
+            pictures=TwitterProfile.Pictures(),
         ),
         id="@nobio",
+    ),
+    pytest.param(
+        ProfileTestParams(
+            username="nopicnobio",
+        ),
+        TwitterProfile(
+            id=None,
+            username="NopicNobio",
+            fullname="Nopic",
+            biography="",
+            verified=True,  # TODO Change to False after fixing _get_profile_verified()
+            joined_datetime="2022-04-12T15:57:00Z",
+            stats=TwitterProfile.Stats(
+                # at 2022-10-23, decreased
+                tweets=1400,
+                followers=5,
+                following=30,
+                likes=1200,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=None,
+                banner=None,
+            ),
+        ),
+        id="@NopicNobio",
     ),
     pytest.param(
         ProfileTestParams(

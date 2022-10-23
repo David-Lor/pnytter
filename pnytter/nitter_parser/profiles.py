@@ -50,6 +50,8 @@ class NitterProfilesParser(BaseNitterParser):
         return div.text if div else ""
 
     def _get_profile_verified(self) -> bool:
+        # TODO Returning True if the user is not verified but retweeted from a verified account?
+        #  (must search the span inside its header)
         return self.soup.find("span", class_="verified-icon") is not None
 
     def _get_profile_join_datetime(self) -> datetime.datetime:
@@ -75,16 +77,34 @@ class NitterProfilesParser(BaseNitterParser):
 
     def _get_profile_pictures(self) -> TwitterProfile.Pictures:
         # TODO Failing for certain instances (nitter.domain.glass)
-        pic_profile_src = self.soup.find("a", class_="profile-card-avatar").get("href")
-        pic_banner_src = self.soup.find("div", class_="profile-banner").find("a").get("href")
+        pic_profile_src, pic_banner_src = None, None
+
+        pic_profile_a = self.soup.find("a", class_="profile-card-avatar")
+        if pic_profile_a:
+            pic_profile_src = pic_profile_a.get("href")
+
+        pic_banner_div = self.soup.find("div", class_="profile-banner")
+        if pic_banner_div:
+            pic_banner_a = pic_banner_div.find("a")
+            if pic_banner_a:
+                pic_banner_src = pic_banner_a.get("href")
+
+        pic_profile, pic_banner = None, None
+        if pic_profile_src and "default_profile" not in pic_profile_src:
+            pic_profile = TwitterURL.from_nitter_path(pic_profile_src)
+        if pic_banner_src:
+            pic_banner = TwitterURL.from_nitter_path(pic_banner_src)
 
         return TwitterProfile.Pictures(
-            profile=TwitterURL.from_nitter_path(pic_profile_src),
-            banner=TwitterURL.from_nitter_path(pic_banner_src),
+            profile=pic_profile,
+            banner=pic_banner,
         )
 
     @staticmethod
-    def _get_profile_id_from_profile_pictures(pictures: TwitterProfile.Pictures) -> str:
+    def _get_profile_id_from_profile_pictures(pictures: TwitterProfile.Pictures) -> Optional[str]:
+        if not pictures.banner:
+            return None
+
         banner_path = pictures.banner.twitter_url.path
         # if banner_path="/profile_banners/12/1584998840/1500x500"
         # then profile_id="12"
