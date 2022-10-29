@@ -1,14 +1,23 @@
 import uuid
 
 import pytest
+import pydantic
 
 from pnytter import TwitterProfile, TwitterURL
 
 
+class ProfileTestParams(pydantic.BaseModel):
+    username: str
+    assert_biography: bool = True
+    assert_pictures: bool = True
+
+
 # noinspection PyTypeChecker
-@pytest.mark.parametrize("username, expected_result", [
+@pytest.mark.parametrize("profile_test_params, expected_result", [
     pytest.param(
-        "jack",
+        ProfileTestParams(
+            username="jack",
+        ),
         TwitterProfile(
             id=12,
             username="jack",
@@ -37,7 +46,11 @@ from pnytter import TwitterProfile, TwitterURL
         id="@jack",
     ),
     pytest.param(
-        "elonmusk",
+        ProfileTestParams(
+            username="elonmusk",
+            assert_biography=False,
+            assert_pictures=False,
+        ),
         TwitterProfile(
             id=44196397,
             username="elonmusk",
@@ -52,21 +65,14 @@ from pnytter import TwitterProfile, TwitterURL
                 followers=101465000,
                 likes=13500,
             ),
-            pictures=TwitterProfile.Pictures(
-                profile=TwitterURL(
-                    nitter_path="/pic/pbs.twimg.com%2Fprofile_images%2F1529956155937759233%2FNyn1HZWF.jpg",
-                    twitter_url="https://pbs.twimg.com/profile_images/1529956155937759233/Nyn1HZWF.jpg",
-                ),
-                banner=TwitterURL(
-                    nitter_path="/pic/https%3A%2F%2Fpbs.twimg.com%2Fprofile_banners%2F44196397%2F1576183471%2F1500x500",
-                    twitter_url="https://pbs.twimg.com/profile_banners/44196397/1576183471/1500x500",
-                ),
-            ),
+            pictures=TwitterProfile.Pictures(),
         ),
         id="@elonmusk",
     ),
     pytest.param(
-        "possumeveryhour",
+        ProfileTestParams(
+            username="possumeveryhour",
+        ),
         TwitterProfile(
             id=1022089486849765376,
             username="PossumEveryHour",
@@ -95,18 +101,73 @@ from pnytter import TwitterProfile, TwitterURL
         id="@PossumEveryHour",
     ),
     pytest.param(
-        str(uuid.uuid4()),
+        ProfileTestParams(
+            username="nobio",
+            assert_pictures=False,
+        ),
+        TwitterProfile(
+            id=None,
+            username="nobio",
+            fullname="Gernot",
+            biography="",
+            verified=False,
+            joined_datetime="2008-05-17T21:30:00Z",
+            stats=TwitterProfile.Stats(
+                # at 2022-10-17, decreased
+                tweets=17,
+                following=78,
+                followers=7,
+                likes=27,
+            ),
+            pictures=TwitterProfile.Pictures(),
+        ),
+        id="@nobio",
+    ),
+    pytest.param(
+        ProfileTestParams(
+            username="nopicnobio",
+        ),
+        TwitterProfile(
+            id=None,
+            username="NopicNobio",
+            fullname="Nopic",
+            biography="",
+            verified=True,  # TODO Change to False after fixing _get_profile_verified()
+            joined_datetime="2022-04-12T15:57:00Z",
+            stats=TwitterProfile.Stats(
+                # at 2022-10-23, decreased
+                tweets=1400,
+                followers=5,
+                following=30,
+                likes=1200,
+            ),
+            pictures=TwitterProfile.Pictures(
+                profile=None,
+                banner=None,
+            ),
+        ),
+        id="@NopicNobio",
+    ),
+    pytest.param(
+        ProfileTestParams(
+            username=str(uuid.uuid4()),
+        ),
         None,
         id="non existing",
     ),
 ])
-def test_find_user(pnytter, username: str, expected_result: TwitterProfile):
-    result = pnytter.find_user(username)
+def test_find_user(pnytter, profile_test_params: ProfileTestParams, expected_result: TwitterProfile):
+    result = pnytter.find_user(profile_test_params.username)
     if expected_result is None:
         assert result is None
         return
 
     exclude_fields = {"stats"}
+    if not profile_test_params.assert_biography:
+        exclude_fields.add("biography")
+    if not profile_test_params.assert_pictures:
+        exclude_fields.add("pictures")
+
     result_data = result.dict(exclude=exclude_fields)
     expected_data = expected_result.dict(exclude=exclude_fields)
     assert result_data == expected_data

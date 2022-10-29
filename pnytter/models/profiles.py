@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 import pydantic
 
@@ -17,10 +18,10 @@ class TwitterProfile(BasePnytterModel):
         likes: int = PosInt
 
     class Pictures(BasePnytterModel):
-        profile: TwitterURL
-        banner: TwitterURL
+        profile: Optional[TwitterURL] = None
+        banner: Optional[TwitterURL] = None
 
-    id: int = pydantic.Field(..., ge=0)
+    id: Optional[int] = pydantic.Field(None, ge=0)
     username: str = NEString
     fullname: str
     biography: str

@@ -1,16 +1,28 @@
 import datetime
 import math
 import base64
+from typing import List
 
 from pnytter import TwitterTweet
 from pnytter.utils import Const
 
 
-class GetTweetsYearprogress:
+class BaseGetTweetsScenario:
+    username: str
+    filter_from: str
+    filter_to: str
+    expected_tweets: List[TwitterTweet]
+
+    @classmethod
+    def get_expected_pages(cls):
+        return math.ceil(len(cls.expected_tweets) / Const.Nitter.tweets_per_page)
+
+
+class GetTweetsYearprogress(BaseGetTweetsScenario):
     username = "year_progress"
     filter_from = "2022-01-04"
     filter_to = "2022-06-28"
-    expected_result = [TwitterTweet(tweet_id=1540560429335908353, author='year_progress', created_on=datetime.datetime(2022, 6, 25, 5, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 48%', stats=TwitterTweet.Stats(comments=40, retweets=1216, quotes=115, likes=8141)),
+    expected_tweets = [TwitterTweet(tweet_id=1540560429335908353, author='year_progress', created_on=datetime.datetime(2022, 6, 25, 5, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 48%', stats=TwitterTweet.Stats(comments=40, retweets=1216, quotes=115, likes=8141)),
                        TwitterTweet(tweet_id=1539246778041745409, author='year_progress', created_on=datetime.datetime(2022, 6, 21, 14, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 47%', stats=TwitterTweet.Stats(comments=29, retweets=1066, quotes=113, likes=5497)),
                        TwitterTweet(tweet_id=1537918020118491136, author='year_progress', created_on=datetime.datetime(2022, 6, 17, 22, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 46%', stats=TwitterTweet.Stats(comments=26, retweets=984, quotes=102, likes=5866)),
                        TwitterTweet(tweet_id=1536589258370297856, author='year_progress', created_on=datetime.datetime(2022, 6, 14, 6, 0, tzinfo=datetime.timezone.utc), text='▓▓▓▓▓▓▓░░░░░░░░ 45%', stats=TwitterTweet.Stats(comments=40, retweets=1490, quotes=144, likes=7543)),
@@ -59,7 +71,6 @@ class GetTweetsYearprogress:
                        TwitterTweet(tweet_id=1481038240790593538, author='year_progress', created_on=datetime.datetime(2022, 1, 11, 23, 0, tzinfo=datetime.timezone.utc), text='░░░░░░░░░░░░░░░ 3%', stats=TwitterTweet.Stats(comments=72, retweets=1554, quotes=222, likes=12689)),
                        TwitterTweet(tweet_id=1479724568273211392, author='year_progress', created_on=datetime.datetime(2022, 1, 8, 8, 0, tzinfo=datetime.timezone.utc), text='░░░░░░░░░░░░░░░ 2%', stats=TwitterTweet.Stats(comments=113, retweets=2524, quotes=318, likes=25186)),
                        TwitterTweet(tweet_id=1478395814053568512, author='year_progress', created_on=datetime.datetime(2022, 1, 4, 16, 0, tzinfo=datetime.timezone.utc), text='░░░░░░░░░░░░░░░ 1%', stats=TwitterTweet.Stats(comments=170, retweets=4911, quotes=772, likes=36530))]
-    expected_pages = math.ceil(len(expected_result) / Const.Nitter.tweets_per_page)
 
 
 NonExistingTweetId = "1549959479621324805"

@@ -68,7 +68,7 @@ jobs:
       - name: Set PyPI repository/token (production)
         if: ${{ github.event.inputs.test-repository == 'false' }}
         run: |-
-          echo "PYPI_REPOSITORY=https://pypi.python.org/simple/" >> $GITHUB_ENV
+          echo "PYPI_REPOSITORY=https://upload.pypi.org/legacy/" >> $GITHUB_ENV
           echo "PYPI_TOKEN=${{ secrets.PYPI_TOKEN }}" >> $GITHUB_ENV
 
       - name: Set PyPI repository/token (test)
