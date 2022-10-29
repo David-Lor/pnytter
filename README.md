@@ -105,6 +105,9 @@ pprint.pp(tweet.dict())
 
 Versions 0.y.z are expected to be unstable, and the API may change on Minor (y) releases.
 
+- 0.2.1
+  - Fix error when a profile does not have a picture and/or banner. **Breaking**: `TwitterProfile.id` & `TwitterProfile.Pictures.*` fields are optional, when the profile lacks picture/banner.
+  - Fix error when a profile does not have a biography.
 - 0.1.1
   - Get tweet stats (count of comments, retweets, quotes, likes)
   - Allow configuring Nitter instances after Pnytter initialization
