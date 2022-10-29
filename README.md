@@ -18,7 +18,7 @@ This project currently features the following:
   - Get a single Tweet data by Tweet ID
 - Technical details:
   - Usage of multiple Nitter instances (chosen randomly for each request)
-  - Return data as [Pydantic](https://pydantic-docs.helpmanual.io) models
+  - Return data using [Pydantic](https://pydantic-docs.helpmanual.io) objects
 
 The features are bound to the development of my [twitterscraper](https://github.com/David-Lor/twitterscraper). Features may be requested through Issues or (preferably) Pull-Requests.
 
@@ -26,7 +26,7 @@ The features are bound to the development of my [twitterscraper](https://github.
 
 - Python >= 3.7
 - Requirements listed on [requirements.txt](requirements.txt)
-- A hosted Nitter instance is recommeded for intensive use, to avoid overloading the public instances
+- A hosted Nitter instance is recommeded for intensive use, to avoid overloading the public instances. It is recommended to use a Nitter version according the release date of the Pnytter version being used, to avoid incompatibilities.
 
 ## Installing
 
@@ -99,10 +99,7 @@ pprint.pp(tweet.dict())
 ### Unfixable
 
 - Certain tweets are not available on certain regions due to legal reasons. Pnytter method `get_tweet` allows forcing the query of all available Nitter instances until available in one of them.
-
-### Solvable (pending)
-
-- The URL parsing of media (profile pictures) does not work with certain instances (known: `nitter.domain.glass`), in which case the object initialization fails.
+- Instances running certain versions of Nitter may not be compatible with the current Pnytter codebase. It is recommended to run/use a Nitter instance using an updated version, or a version according the release date of a targetted Pnytter version.
 
 ## Changelog
 
