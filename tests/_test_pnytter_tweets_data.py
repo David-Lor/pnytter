@@ -77,12 +77,3 @@ class GetTweetsYearprogress(BaseGetTweetsScenario):
 
 
 NonExistingTweetId = "1549959479621324805"
-
-
-GermanyBlockedTweet = TwitterTweet(
-    tweet_id=1168900522092441600,
-    author='ShahakShapira',
-    created_on=datetime.datetime(2019, 9, 3, 14, 56, tzinfo=datetime.timezone.utc),
-    text=base64.b64decode(b'S2lzcyBteSBibGFjayBhc3MgaWhyIEZhc2Noby3DnGJlcnNlaGVyLg==').decode(),
-    stats=TwitterTweet.Stats(comments=0, retweets=0, quotes=0, likes=0)
-)
