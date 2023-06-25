@@ -7,9 +7,6 @@ from pnytter import TwitterTweet
 from tests._test_pnytter_tweets_data import BaseGetTweetsScenario, GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
 
 
-# TODO Ignoring failures on this test, because of bug on Nitter causing search randomly missing tweets.
-#      Remove the pytest.mark.flaky when this gets fixed.
-@pytest.mark.flaky
 @pytest.mark.parametrize("scenario", [
     pytest.param(
         GetTweetsYearprogress,
