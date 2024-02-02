@@ -26,10 +26,10 @@ class ProfileTestParams(pydantic.BaseModel):
             verified=False,
             joined_datetime="2018-07-25T12:01:00Z",
             stats=TwitterProfile.Stats(
-                # at 2023-06-24, decreased to less than expected
+                # at 2024-02-02, decreased to less than expected
                 tweets=34100,
                 following=1,
-                followers=560000,
+                followers=500000,
                 likes=0,
             ),
             pictures=TwitterProfile.Pictures(
