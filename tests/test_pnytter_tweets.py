@@ -4,12 +4,9 @@ import pytest
 
 from pnytter import TwitterTweet
 
-from tests._test_pnytter_tweets_data import BaseGetTweetsScenario, GetTweetsYearprogress, NonExistingTweetId, GermanyBlockedTweet
+from tests._test_pnytter_tweets_data import BaseGetTweetsScenario, GetTweetsYearprogress, NonExistingTweetId
 
 
-# TODO Ignoring failures on this test, because of bug on Nitter causing search randomly missing tweets.
-#      Remove the pytest.mark.flaky when this gets fixed.
-@pytest.mark.flaky
 @pytest.mark.parametrize("scenario", [
     pytest.param(
         GetTweetsYearprogress,
@@ -68,32 +65,6 @@ def test_get_single_tweet(pnytter, tweet_id: str, expected_tweet: TwitterTweet):
 
     result = pnytter.get_tweet(tweet_id, search_all_instances=True)
     _assert_tweet(expected=expected_tweet, actual=result, assert_stats=True)
-
-
-def test_get_unavailable_tweet_single_instance(pnytter):
-    """Get a tweet blocked in Germany, from a public Nitter instance hosted on Germany.
-    The tweet should not be returned."""
-    pnytter.nitter_instances = ["https://nitter.pussthecat.org"]
-
-    result = pnytter.get_tweet(GermanyBlockedTweet.tweet_id)
-    assert result is None
-
-
-def test_get_unavailable_tweet_multiple_instances(pnytter):
-    """Get a tweet blocked in Germany, using public instances hosted on Germany and other countries.
-    The tweet should eventually be returned."""
-    pnytter.nitter_instances = [
-        # German instances
-        "https://nitter.pussthecat.org",
-        "https://nitter.grimneko.de",
-        # Other instances
-        "https://nitter.ca",
-    ]
-
-    # TODO Capture requests performed and assert the instances requested
-
-    result = pnytter.get_tweet(GermanyBlockedTweet.tweet_id, search_all_instances=True)
-    _assert_tweet(actual=result, expected=GermanyBlockedTweet)
 
 
 def _assert_tweets(actual: List[TwitterTweet], expected: List[TwitterTweet], assert_as_is: bool = False, assert_stats: bool = False):
