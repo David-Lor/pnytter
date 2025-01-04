@@ -1,5 +1,7 @@
 # pnytter
 
+**This project is archived (for now), since Nitter is not working properly because Twitter is making massive changes.**
+
 A Python library for scraping Twitter using one or more [Nitter](https://github.com/zedeus/nitter) instances.
 
 ## About Nitter & Pnytter
